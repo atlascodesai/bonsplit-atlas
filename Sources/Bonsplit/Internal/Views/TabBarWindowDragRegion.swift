@@ -34,35 +34,35 @@ private func performTabBarStandardDoubleClick(window: NSWindow?) -> Bool {
 
 struct TabBarWindowDragRegion: NSViewRepresentable {
     func makeNSView(context: Context) -> NSView {
-        DraggableView()
+        TabBarWindowDragRegionView()
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {}
+}
 
-    private final class DraggableView: NSView {
-        override var mouseDownCanMoveWindow: Bool { false }
+final class TabBarWindowDragRegionView: NSView {
+    override var mouseDownCanMoveWindow: Bool { false }
 
-        override func mouseDown(with event: NSEvent) {
-            if event.clickCount >= 2, performTabBarStandardDoubleClick(window: window) {
-                return
-            }
-
-            guard let window else {
-                super.mouseDown(with: event)
-                return
-            }
-
-            let previousMovableState = window.isMovable
-            if !previousMovableState {
-                window.isMovable = true
-            }
-            defer {
-                if window.isMovable != previousMovableState {
-                    window.isMovable = previousMovableState
-                }
-            }
-
-            window.performDrag(with: event)
+    override func mouseDown(with event: NSEvent) {
+        if event.clickCount >= 2, performTabBarStandardDoubleClick(window: window) {
+            return
         }
+
+        guard let window else {
+            super.mouseDown(with: event)
+            return
+        }
+
+        let previousMovableState = window.isMovable
+        if !previousMovableState {
+            window.isMovable = true
+        }
+        defer {
+            if window.isMovable != previousMovableState {
+                window.isMovable = previousMovableState
+            }
+        }
+
+        window.performDrag(with: event)
     }
 }
