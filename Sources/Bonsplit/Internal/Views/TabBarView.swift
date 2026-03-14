@@ -444,6 +444,10 @@ struct TabBarView: View {
     private var splitButtons: some View {
         let tooltips = controller.configuration.appearance.splitButtonTooltips
         HStack(spacing: 4) {
+            if let extraButtons = controller.extraTabBarLeadingButtons {
+                extraButtons
+            }
+
             Button {
                 controller.requestNewTab(kind: "terminal", inPane: pane.id)
             } label: {

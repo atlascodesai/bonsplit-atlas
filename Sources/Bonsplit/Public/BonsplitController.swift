@@ -51,6 +51,10 @@ public final class BonsplitController {
     /// Return `true` when the drop has been handled by the host application.
     @ObservationIgnored public var onExternalTabDrop: ((ExternalTabDropRequest) -> Bool)?
 
+    /// Optional extra buttons to display at the leading edge of the tab bar's action buttons.
+    /// The host app can inject custom toolbar buttons (e.g., editor sync) without modifying Bonsplit internals.
+    @ObservationIgnored public var extraTabBarLeadingButtons: AnyView?
+
     // MARK: - Internal State
 
     internal var internalController: SplitViewController
