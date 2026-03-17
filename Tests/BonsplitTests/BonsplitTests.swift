@@ -730,6 +730,78 @@ final class BonsplitTests: XCTestCase {
         )
     }
 
+    @MainActor
+    func testTranslucentSplitContainersStayClear() {
+        let appearance = BonsplitConfiguration.Appearance(
+            enableAnimations: false,
+            chromeColors: .init(backgroundHex: "#11223380")
+        )
+        let configuration = BonsplitConfiguration(appearance: appearance)
+        let controller = BonsplitController(configuration: configuration)
+        _ = controller.createTab(title: "Base")
+        guard let sourcePane = controller.focusedPaneId else {
+            XCTFail("Expected focused pane")
+            return
+        }
+        guard controller.splitPane(sourcePane, orientation: .horizontal) != nil else {
+            XCTFail("Expected splitPane to create a new pane")
+            return
+        }
+
+        let hostingView = NSHostingView(
+            rootView: BonsplitView(controller: controller) { _, _ in
+                Color.clear
+            } emptyPane: { _ in
+                Color.clear
+            }
+        )
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 800, height: 600),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        defer { window.orderOut(nil) }
+        guard let contentView = window.contentView else {
+            XCTFail("Expected content view")
+            return
+        }
+
+        hostingView.frame = contentView.bounds
+        hostingView.autoresizingMask = [.width, .height]
+        contentView.addSubview(hostingView)
+
+        window.makeKeyAndOrderFront(nil)
+        contentView.layoutSubtreeIfNeeded()
+        RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        contentView.layoutSubtreeIfNeeded()
+
+        guard let splitView = firstDescendant(ofType: NSSplitView.self, in: hostingView) else {
+            XCTFail("Expected split view")
+            return
+        }
+        XCTAssertEqual(splitView.arrangedSubviews.count, 2)
+
+        let dividerBackground = splitView.layer?.backgroundColor.flatMap(NSColor.init(cgColor:))
+        XCTAssertNotNil(dividerBackground, "Expected split view to keep its divider background")
+        XCTAssertEqual(
+            dividerBackground?.alphaComponent ?? 0,
+            CGFloat(128.0 / 255.0),
+            accuracy: 0.01
+        )
+
+        for container in splitView.arrangedSubviews {
+            let background = container.layer?.backgroundColor.flatMap(NSColor.init(cgColor:))
+            XCTAssertNotNil(background, "Expected arranged subview to be layer-backed")
+            XCTAssertEqual(
+                background?.alphaComponent ?? -1,
+                0,
+                accuracy: 0.001,
+                "Split-only wrapper containers should stay clear so translucent pane chrome is not composited twice"
+            )
+        }
+    }
+
     private func withShortcutHintDefaultsSuite(_ body: (UserDefaults) -> Void) {
         let suiteName = "BonsplitShortcutHintPolicyTests-\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suiteName) else {
@@ -740,5 +812,17 @@ final class BonsplitTests: XCTestCase {
         defaults.removePersistentDomain(forName: suiteName)
         body(defaults)
         defaults.removePersistentDomain(forName: suiteName)
+    }
+
+    private func firstDescendant<T: NSView>(ofType type: T.Type, in root: NSView) -> T? {
+        if let match = root as? T {
+            return match
+        }
+        for subview in root.subviews {
+            if let match = firstDescendant(ofType: type, in: subview) {
+                return match
+            }
+        }
+        return nil
     }
 }
