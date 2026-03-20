@@ -55,6 +55,9 @@ public final class BonsplitController {
     /// The host app can inject custom toolbar buttons (e.g., editor sync) without modifying Bonsplit internals.
     @ObservationIgnored public var extraTabBarLeadingButtons: AnyView?
 
+    /// Optional context menu to display on right-click of the browser (globe) button.
+    @ObservationIgnored public var browserButtonContextMenu: AnyView?
+
     // MARK: - Internal State
 
     internal var internalController: SplitViewController

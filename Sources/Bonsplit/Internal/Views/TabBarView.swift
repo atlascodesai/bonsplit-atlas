@@ -465,6 +465,11 @@ struct TabBarView: View {
             }
             .buttonStyle(SplitActionButtonStyle(appearance: appearance))
             .safeHelp(tooltips.newBrowser)
+            .contextMenu {
+                if let menu = controller.browserButtonContextMenu {
+                    menu
+                }
+            }
 
             Button {
                 // 120fps animation handled by SplitAnimator
