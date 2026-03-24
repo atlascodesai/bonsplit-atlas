@@ -16,4 +16,6 @@ public enum TabContextAction: String, CaseIterable, Sendable {
     case markAsRead
     case markAsUnread
     case toggleZoom
+    case revealInFinder
+    case copyPath
 }

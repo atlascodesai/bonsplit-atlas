@@ -42,6 +42,7 @@ struct TabContextMenuState {
     let canCloseOthers: Bool
     let isZoomed: Bool
     let hasSplits: Bool
+    let hasDirectory: Bool
     let shortcuts: [TabContextAction: KeyboardShortcut]
 
     var canMarkAsUnread: Bool {
@@ -312,6 +313,7 @@ struct TabBarView: View {
             canCloseOthers: canCloseOthers,
             isZoomed: splitViewController.zoomedPaneId == pane.id,
             hasSplits: splitViewController.rootNode.allPaneIds.count > 1,
+            hasDirectory: controller.tabHasDirectory?(tab.id) ?? false,
             shortcuts: controller.contextMenuShortcuts
         )
     }

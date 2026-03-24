@@ -377,6 +377,14 @@ struct TabItemView: View {
             contextButton("Mark Tab as Unread", action: .markAsUnread)
                 .disabled(!contextMenuState.canMarkAsUnread)
         }
+
+        Divider()
+
+        contextButton("Reveal in Finder", action: .revealInFinder)
+            .disabled(!contextMenuState.hasDirectory)
+
+        contextButton("Copy Path", action: .copyPath)
+            .disabled(!contextMenuState.hasDirectory)
     }
 
     @ViewBuilder

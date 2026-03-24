@@ -610,6 +610,10 @@ public final class BonsplitController {
     /// Set by the host app to sync with its customizable keyboard shortcut settings.
     public var contextMenuShortcuts: [TabContextAction: KeyboardShortcut] = [:]
 
+    /// Closure provided by the host app to check whether a tab has a working directory.
+    /// Used to enable/disable "Reveal in Finder" and "Copy Relative Path" in tab context menus.
+    public var tabHasDirectory: ((UUID) -> Bool)?
+
     // MARK: - Query Methods
 
     /// Get all tab IDs
